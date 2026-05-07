@@ -31,10 +31,10 @@ pub fn calculate_balance(utxos: &[Utxo]) -> BalanceSummary {
     let total_spendable = confirmed + trusted_pending;
 
     BalanceSummary {
-        confirmed: confirmed,
-        trusted_pending: trusted_pending,
-        untrusted_pending: untrusted_pending,
-        total_spendable: total_spendable,
+        confirmed,
+        trusted_pending,
+        untrusted_pending,
+        total_spendable,
     }
 }
 
