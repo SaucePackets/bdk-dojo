@@ -8,6 +8,6 @@ pub struct OutPoint {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Utxo {
-    pub outpint: OutPoint,
+    pub outpoint: OutPoint,
     pub value: Amount,
 }
