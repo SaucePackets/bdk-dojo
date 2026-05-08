@@ -29,5 +29,6 @@ mod tests {
 
         assert_eq!(utxo.outpoint.vout, 0);
         assert_eq!(utxo.value.to_sats(), 12_345);
+        assert_eq!(utxo.outpoint.txid, "00".repeat(32));
     }
 }
