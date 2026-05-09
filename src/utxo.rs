@@ -10,4 +10,6 @@ pub struct OutPoint {
 pub struct Utxo {
     pub outpoint: OutPoint,
     pub value: Amount,
+    pub confirmed: bool,
+    pub spendable: bool,
 }

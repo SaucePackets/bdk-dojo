@@ -50,6 +50,8 @@ mod tests {
                     vout: 0,
                 },
                 value: Amount::from_sats(21_000),
+                confirmed: true,
+                spendable: true,
             },
             Utxo {
                 outpoint: OutPoint {
@@ -57,6 +59,8 @@ mod tests {
                     vout: 1,
                 },
                 value: Amount::from_sats(79_000),
+                confirmed: true,
+                spendable: true,
             },
         ];
 
