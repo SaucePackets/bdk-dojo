@@ -60,3 +60,32 @@ Pain point:
 Next lesson:
 
 - 1.3 — Balance buckets
+
+## 1.3 — Balance buckets
+
+Status: complete
+
+Files changed:
+
+- `src/utxo.rs`
+- `src/balance.rs`
+- `src/lib.rs`
+
+Tests passed:
+
+- `tests::classify_balance_empty_wallet_is_zeroed`
+- `tests::classify_balance_separates_trust_and_spendability`
+
+What was learned:
+
+- `calculate_balance` returns only total sats.
+- `classify_balance` returns confirmed, trusted pending, untrusted pending, and total spendable buckets.
+- A wallet balance is not just one number once trust and spendability matter.
+
+Pain point:
+
+- Resolved: balance category names and their purpose.
+
+Next lesson:
+
+- 1.4 — Wallet state

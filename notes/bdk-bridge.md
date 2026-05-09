@@ -40,3 +40,23 @@ What the toy hides:
 What to read next:
 
 - Lesson 1.3 splits total sats into simple trust and spendability buckets.
+
+## 1.3 — Balance buckets
+
+Toy concept:
+
+- `BalanceSummary`
+- `classify_balance(&[Utxo]) -> BalanceSummary`
+
+Closest BDK concept/API/example:
+
+- Real wallet balance APIs expose categories, not just a single total.
+- Balance categories help callers distinguish settled, pending, trusted, and spendable funds.
+
+What the toy hides:
+
+- Real BDK balance policy accounts for richer chain state, coinbase maturity, transaction trust rules, and wallet-specific spendability.
+
+What to read next:
+
+- Lesson 1.4 wraps UTXOs in `WalletState` so balance becomes a wallet method instead of loose global state.

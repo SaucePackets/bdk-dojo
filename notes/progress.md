@@ -68,3 +68,37 @@ Bitcoin/BDK pain point:
 Next lesson:
 
 - 1.3 — Balance buckets
+
+## 1.3 — Balance buckets
+
+Completed.
+
+Files changed:
+
+- `src/utxo.rs`
+- `src/balance.rs`
+- `src/lib.rs`
+
+Tests passed:
+
+```text
+7 passed
+```
+
+Concept learned:
+
+- `confirmed`, `trusted_pending`, and `untrusted_pending` describe different kinds of sats.
+- `total_spendable` is confirmed spendable sats plus trusted pending spendable sats.
+- Confirmed but unspendable sats are ignored in this beginner model.
+
+Rust pain point:
+
+- Adding fields to `Utxo` means older tests must construct those fields too.
+
+Bitcoin/BDK pain point:
+
+- Real wallet balance APIs expose categories because trust and spendability affect what the wallet can safely use.
+
+Next lesson:
+
+- 1.4 — Wallet state
