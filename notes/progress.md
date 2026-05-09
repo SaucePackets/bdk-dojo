@@ -35,3 +35,36 @@ Bitcoin/BDK pain point:
 Next lesson:
 
 - 1.2 — Total balance
+
+## 1.2 — Total balance
+
+Completed.
+
+Files changed:
+
+- `src/balance.rs`
+- `src/lib.rs`
+
+Tests passed:
+
+```text
+5 passed
+```
+
+Concept learned:
+
+- `calculate_balance` loops through all UTXOs, adds each `Amount` as sats, and returns the total.
+- `Amount::to_sats()` is the safe conversion boundary from wallet type to raw `u64`.
+- Plain total balance does not care whether a UTXO is confirmed or spendable.
+
+Rust pain point:
+
+- Resolved: do not cast a custom struct with `as u64`; call the explicit method.
+
+Bitcoin/BDK pain point:
+
+- Balance can mean different things. Lesson 1.2 only means total sats.
+
+Next lesson:
+
+- 1.3 — Balance buckets

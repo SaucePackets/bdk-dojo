@@ -3,7 +3,7 @@ pub mod balance;
 pub mod utxo;
 
 pub use amount::Amount;
-pub use balance::calculate_balance;
+pub use balance::{BalanceSummary, calculate_balance, classify_balance};
 pub use utxo::{OutPoint, Utxo};
 
 pub fn dojo_ready() -> bool {
@@ -27,6 +27,8 @@ mod tests {
                 vout: 0,
             },
             value: Amount::from_sats(12_345),
+            confirmed: true,
+            spendable: true,
         };
 
         assert_eq!(utxo.outpoint.vout, 0);
@@ -65,5 +67,70 @@ mod tests {
         ];
 
         assert_eq!(calculate_balance(&utxos), 100_000);
+    }
+
+    #[test]
+    fn classify_balance_empty_wallet_is_zeroed() {
+        assert_eq!(
+            classify_balance(&[]),
+            BalanceSummary {
+                confirmed: 0,
+                trusted_pending: 0,
+                untrusted_pending: 0,
+                total_spendable: 0,
+            }
+        );
+    }
+
+    #[test]
+    fn classify_balance_separates_trust_and_spendability() {
+        let utxos = [
+            Utxo {
+                outpoint: OutPoint {
+                    txid: "33".repeat(32),
+                    vout: 0,
+                },
+                value: Amount::from_sats(50_000),
+                confirmed: true,
+                spendable: true,
+            },
+            Utxo {
+                outpoint: OutPoint {
+                    txid: "44".repeat(32),
+                    vout: 1,
+                },
+                value: Amount::from_sats(20_000),
+                confirmed: false,
+                spendable: true,
+            },
+            Utxo {
+                outpoint: OutPoint {
+                    txid: "55".repeat(32),
+                    vout: 2,
+                },
+                value: Amount::from_sats(10_000),
+                confirmed: false,
+                spendable: false,
+            },
+            Utxo {
+                outpoint: OutPoint {
+                    txid: "66".repeat(32),
+                    vout: 3,
+                },
+                value: Amount::from_sats(5_000),
+                confirmed: true,
+                spendable: false,
+            },
+        ];
+
+        assert_eq!(
+            classify_balance(&utxos),
+            BalanceSummary {
+                confirmed: 50_000,
+                trusted_pending: 20_000,
+                untrusted_pending: 10_000,
+                total_spendable: 70_000,
+            }
+        );
     }
 }

@@ -32,3 +32,31 @@ Pain point:
 Next lesson:
 
 - 1.2 — Total balance
+
+## 1.2 — Total balance
+
+Status: complete
+
+Files changed:
+
+- `src/balance.rs`
+- `src/lib.rs`
+
+Tests passed:
+
+- `tests::calculate_balance_empty_wallet_is_zero`
+- `tests::calculate_balance_sums_all_utxos`
+
+What was learned:
+
+- `calculate_balance` loops through all UTXOs, adds their sats, and returns the total.
+- `Amount` should be converted with `to_sats()`, not cast with `as u64`.
+- Total balance is deliberately simpler than trust, confirmation, or spendability classification.
+
+Pain point:
+
+- Resolved: `Amount` is a wallet type; `to_sats()` exposes the primitive sat count.
+
+Next lesson:
+
+- 1.3 — Balance buckets
