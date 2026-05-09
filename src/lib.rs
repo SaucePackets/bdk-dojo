@@ -1,8 +1,10 @@
 pub mod amount;
 pub mod utxo;
+pub mod balance;
 
 pub use amount::Amount;
 pub use utxo::{OutPoint, Utxo};
+pub use balance::calculate_balance;
 
 pub fn dojo_ready() -> bool {
     true
