@@ -10,7 +10,7 @@ pub struct WalletState {
 impl WalletState {
     pub fn new(tip_height: u32) -> Self {
         WalletState {
-            utxos: [],
+            utxos: Vec::new(),
             tip_height,
         }
     }

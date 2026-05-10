@@ -135,4 +135,69 @@ mod tests {
             }
         );
     }
+
+    #[test]
+    fn empty_wallet_balance_is_zeroed() {
+        let wallet = WalletState::new(100);
+
+        assert_eq!(wallet.tip_height, 100);
+        assert!(wallet.utxos.is_empty());
+
+        assert_eq!(
+            wallet.balance(),
+            BalanceSummary {
+                confirmed: 0,
+                trusted_pending: 0,
+                untrusted_pending: 0,
+                total_spendable: 0,
+            }
+        );
+    }
+
+    #[test]
+    fn wallet_balance_delegates_to_classify_balance() {
+        let mut wallet = WalletState::new(100);
+
+        wallet.utxos.push(Utxo {
+            outpoint: OutPoint {
+                txid: "77".repeat(32),
+                vout: 0,
+            },
+            value: Amount::from_sats(50_000),
+            confirmed: true,
+            spendable: true,
+        });
+
+        wallet.utxos.push(Utxo {
+            outpoint: OutPoint {
+                txid: "88".repeat(32),
+                vout: 1,
+            },
+            value: Amount::from_sats(20_000),
+            confirmed: false,
+            spendable: true,
+        });
+
+        wallet.utxos.push(Utxo {
+            outpoint: OutPoint {
+                txid: "99".repeat(32),
+                vout: 2,
+            },
+            value: Amount::from_sats(10_000),
+            confirmed: false,
+            spendable: false,
+        });
+
+        assert_eq!(
+            wallet.balance(),
+            BalanceSummary {
+                confirmed: 50_000,
+                trusted_pending: 20_000,
+                untrusted_pending: 10_000,
+                total_spendable: 70_000
+            }
+        );
+
+        assert_eq!(wallet.balance(), classify_balance(&wallet.utxos));
+    }
 }
