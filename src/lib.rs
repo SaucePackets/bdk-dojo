@@ -1,14 +1,14 @@
 pub mod amount;
 pub mod balance;
+pub mod chain;
 pub mod utxo;
 pub mod wallet;
-pub mod chain;
 
 pub use amount::Amount;
 pub use balance::{BalanceSummary, calculate_balance, classify_balance};
+pub use chain::confirmations;
 pub use utxo::{OutPoint, Utxo};
 pub use wallet::WalletState;
-pub use chain::confirmations;
 
 pub fn dojo_ready() -> bool {
     true
@@ -17,6 +17,19 @@ pub fn dojo_ready() -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn utxo_seen_at(height: Option<u32>) -> Utxo {
+        Utxo {
+            outpoint: OutPoint {
+                txid: "aa".repeat(32),
+                vout: 0,
+            },
+            value: Amount::from_sats(1_000),
+            confirmed: height.is_some(),
+            spendable: true,
+            seen_at_height: height,
+        }
+    }
 
     #[test]
     fn fresh_repo_is_ready() {
@@ -34,7 +47,6 @@ mod tests {
             confirmed: true,
             spendable: true,
             seen_at_height: Some(100),
-            
         };
 
         assert_eq!(utxo.outpoint.vout, 0);
@@ -212,5 +224,33 @@ mod tests {
         );
 
         assert_eq!(wallet.balance(), classify_balance(&wallet.utxos));
+    }
+
+    #[test]
+    fn unseen_utxo_has_zero_confirmations() {
+        let utxo = utxo_seen_at(None);
+        let result = confirmations(&utxo, 100);
+        assert_eq!(result, 0);
+    }
+
+    #[test]
+    fn utxo_seen_at_tip_has_one_confirmation() {
+        let utxo = utxo_seen_at(Some(100));
+        let result = confirmations(&utxo, 100);
+        assert_eq!(result, 1);
+    }
+
+    #[test]
+    fn older_utxo_counts_confirmations_inclusively() {
+        let utxo = utxo_seen_at(Some(95));
+        let result = confirmations(&utxo, 100);
+        assert_eq!(result, 6);
+    }
+
+    #[test]
+    fn future_seen_height_has_zero_confirmations() {
+        let utxo = utxo_seen_at(Some(105));
+        let result = confirmations(&utxo, 100);
+        assert_eq!(result, 0);
     }
 }
