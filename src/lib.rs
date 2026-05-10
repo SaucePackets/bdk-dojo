@@ -2,11 +2,13 @@ pub mod amount;
 pub mod balance;
 pub mod utxo;
 pub mod wallet;
+pub mod chain;
 
 pub use amount::Amount;
 pub use balance::{BalanceSummary, calculate_balance, classify_balance};
 pub use utxo::{OutPoint, Utxo};
 pub use wallet::WalletState;
+pub use chain::confirmations;
 
 pub fn dojo_ready() -> bool {
     true
@@ -31,6 +33,8 @@ mod tests {
             value: Amount::from_sats(12_345),
             confirmed: true,
             spendable: true,
+            seen_at_height: Some(100),
+            
         };
 
         assert_eq!(utxo.outpoint.vout, 0);
@@ -56,6 +60,7 @@ mod tests {
                 value: Amount::from_sats(21_000),
                 confirmed: true,
                 spendable: true,
+                seen_at_height: Some(100),
             },
             Utxo {
                 outpoint: OutPoint {
@@ -65,6 +70,7 @@ mod tests {
                 value: Amount::from_sats(79_000),
                 confirmed: true,
                 spendable: true,
+                seen_at_height: Some(100),
             },
         ];
 
@@ -95,6 +101,7 @@ mod tests {
                 value: Amount::from_sats(50_000),
                 confirmed: true,
                 spendable: true,
+                seen_at_height: Some(100),
             },
             Utxo {
                 outpoint: OutPoint {
@@ -104,6 +111,7 @@ mod tests {
                 value: Amount::from_sats(20_000),
                 confirmed: false,
                 spendable: true,
+                seen_at_height: Some(100),
             },
             Utxo {
                 outpoint: OutPoint {
@@ -113,6 +121,7 @@ mod tests {
                 value: Amount::from_sats(10_000),
                 confirmed: false,
                 spendable: false,
+                seen_at_height: Some(100),
             },
             Utxo {
                 outpoint: OutPoint {
@@ -122,6 +131,7 @@ mod tests {
                 value: Amount::from_sats(5_000),
                 confirmed: true,
                 spendable: false,
+                seen_at_height: Some(100),
             },
         ];
 
@@ -166,6 +176,7 @@ mod tests {
             value: Amount::from_sats(50_000),
             confirmed: true,
             spendable: true,
+            seen_at_height: Some(100),
         });
 
         wallet.utxos.push(Utxo {
@@ -176,6 +187,7 @@ mod tests {
             value: Amount::from_sats(20_000),
             confirmed: false,
             spendable: true,
+            seen_at_height: Some(100),
         });
 
         wallet.utxos.push(Utxo {
@@ -186,6 +198,7 @@ mod tests {
             value: Amount::from_sats(10_000),
             confirmed: false,
             spendable: false,
+            seen_at_height: Some(100),
         });
 
         assert_eq!(

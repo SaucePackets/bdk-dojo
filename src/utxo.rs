@@ -12,4 +12,5 @@ pub struct Utxo {
     pub value: Amount,
     pub confirmed: bool,
     pub spendable: bool,
+    pub seen_at_height: Option<u32>,
 }
