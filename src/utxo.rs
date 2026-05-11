@@ -13,4 +13,7 @@ pub struct Utxo {
     pub confirmed: bool,
     pub spendable: bool,
     pub seen_at_height: Option<u32>,
+    pub coinbase: bool,
+    pub locked_until: Option<u32>,
+    pub owned: bool,
 }

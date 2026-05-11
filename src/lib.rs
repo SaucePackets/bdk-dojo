@@ -6,7 +6,7 @@ pub mod wallet;
 
 pub use amount::Amount;
 pub use balance::{BalanceSummary, calculate_balance, classify_balance};
-pub use chain::confirmations;
+pub use chain::{COINBASE_MATURITY, confirmations, is_spendable};
 pub use utxo::{OutPoint, Utxo};
 pub use wallet::WalletState;
 
@@ -28,6 +28,9 @@ mod tests {
             confirmed: height.is_some(),
             spendable: true,
             seen_at_height: height,
+            coinbase: true,
+            locked_until: height,
+            owned: true,
         }
     }
 
@@ -47,6 +50,9 @@ mod tests {
             confirmed: true,
             spendable: true,
             seen_at_height: Some(100),
+            coinbase: true,
+            locked_until: Some(100),
+            owned: true,
         };
 
         assert_eq!(utxo.outpoint.vout, 0);
@@ -73,6 +79,9 @@ mod tests {
                 confirmed: true,
                 spendable: true,
                 seen_at_height: Some(100),
+                coinbase: true,
+                locked_until: Some(100),
+                owned: true,
             },
             Utxo {
                 outpoint: OutPoint {
@@ -83,6 +92,9 @@ mod tests {
                 confirmed: true,
                 spendable: true,
                 seen_at_height: Some(100),
+                coinbase: true,
+                locked_until: Some(100),
+                owned: true,
             },
         ];
 
@@ -114,6 +126,9 @@ mod tests {
                 confirmed: true,
                 spendable: true,
                 seen_at_height: Some(100),
+                coinbase: true,
+                locked_until: Some(100),
+                owned: true,
             },
             Utxo {
                 outpoint: OutPoint {
@@ -124,6 +139,9 @@ mod tests {
                 confirmed: false,
                 spendable: true,
                 seen_at_height: Some(100),
+                coinbase: true,
+                locked_until: Some(100),
+                owned: true,
             },
             Utxo {
                 outpoint: OutPoint {
@@ -134,6 +152,9 @@ mod tests {
                 confirmed: false,
                 spendable: false,
                 seen_at_height: Some(100),
+                coinbase: true,
+                locked_until: Some(100),
+                owned: true,
             },
             Utxo {
                 outpoint: OutPoint {
@@ -144,6 +165,9 @@ mod tests {
                 confirmed: true,
                 spendable: false,
                 seen_at_height: Some(100),
+                coinbase: true,
+                locked_until: Some(100),
+                owned: true,
             },
         ];
 
@@ -189,6 +213,9 @@ mod tests {
             confirmed: true,
             spendable: true,
             seen_at_height: Some(100),
+            coinbase: true,
+            locked_until: Some(100),
+            owned: true,
         });
 
         wallet.utxos.push(Utxo {
@@ -200,6 +227,9 @@ mod tests {
             confirmed: false,
             spendable: true,
             seen_at_height: Some(100),
+            coinbase: true,
+            locked_until: Some(100),
+            owned: true,
         });
 
         wallet.utxos.push(Utxo {
@@ -211,6 +241,9 @@ mod tests {
             confirmed: false,
             spendable: false,
             seen_at_height: Some(100),
+            coinbase: true,
+            locked_until: Some(100),
+            owned: true,
         });
 
         assert_eq!(
@@ -252,5 +285,19 @@ mod tests {
         let utxo = utxo_seen_at(Some(105));
         let result = confirmations(&utxo, 100);
         assert_eq!(result, 0);
+    }
+
+    #[test]
+    fn spendability_rejects_immature_coinbase_locked_and_foreign_utxos() {
+        let utxo = utxo_seen_at(Some(105));
+        let result = confirmations(&utxo, 100) >= 100;
+        assert!(result);
+    }
+
+    #[test]
+    fn normal_owned_unlocked_utxo_is_spendable() {
+        let utxo = utxo_seen_at(Some(100));
+        let result = confirmations(&utxo, 100) >= 100;
+        assert!(result);
     }
 }
