@@ -290,7 +290,7 @@ mod tests {
     #[test]
     fn spendability_rejects_immature_coinbase_locked_and_foreign_utxos() {
         let utxo = utxo_seen_at(Some(105));
-        let result = confirmations(&utxo, 100) >= 100;
+        let result = is_spendable(&utxo, 100);
         assert!(result);
     }
 
@@ -302,7 +302,7 @@ mod tests {
 
         let mut locked = utxo_seen_at(Some(100));
         locked.locked_until = Some(120);
-        assert!(is_spendable(&locked, 100));
+        assert!(!is_spendable(&locked, 100));
 
         let mut foreign = utxo_seen_at(Some(100));
         foreign.owned = false;
