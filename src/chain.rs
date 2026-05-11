@@ -1,4 +1,4 @@
-use crate::utxo::{self, Utxo};
+use crate::utxo::Utxo;
 
 pub const COINBASE_MATURITY: u32 = 100;
 

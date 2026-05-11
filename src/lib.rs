@@ -288,14 +288,14 @@ mod tests {
     }
 
     #[test]
-    fn spendability_rejects_immature_coinbase_locked_and_foreign_utxos() {
-        let utxo = utxo_seen_at(Some(105));
-        let result = is_spendable(&utxo, 100);
-        assert!(result);
+    fn normal_owned_unlocked_utxo_is_spendable() {
+        let utxo = utxo_seen_at(Some(100));
+
+        assert!(is_spendable(&utxo, 100));
     }
 
     #[test]
-    fn normal_owned_unlocked_utxo_is_spendable() {
+    fn spendability_rejects_immature_coinbase_locked_and_foreign_utxos() {
         let mut immature_coinbase = utxo_seen_at(Some(50));
         immature_coinbase.coinbase = true;
         assert!(!is_spendable(&immature_coinbase, 100));
