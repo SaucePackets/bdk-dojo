@@ -28,8 +28,8 @@ mod tests {
             confirmed: height.is_some(),
             spendable: true,
             seen_at_height: height,
-            coinbase: true,
-            locked_until: height,
+            coinbase: false,
+            locked_until: None,
             owned: true,
         }
     }
@@ -50,8 +50,8 @@ mod tests {
             confirmed: true,
             spendable: true,
             seen_at_height: Some(100),
-            coinbase: true,
-            locked_until: Some(100),
+            coinbase: false,
+            locked_until: None,
             owned: true,
         };
 
@@ -79,8 +79,8 @@ mod tests {
                 confirmed: true,
                 spendable: true,
                 seen_at_height: Some(100),
-                coinbase: true,
-                locked_until: Some(100),
+                coinbase: false,
+                locked_until: None,
                 owned: true,
             },
             Utxo {
@@ -92,8 +92,8 @@ mod tests {
                 confirmed: true,
                 spendable: true,
                 seen_at_height: Some(100),
-                coinbase: true,
-                locked_until: Some(100),
+                coinbase: false,
+                locked_until: None,
                 owned: true,
             },
         ];
@@ -126,8 +126,8 @@ mod tests {
                 confirmed: true,
                 spendable: true,
                 seen_at_height: Some(100),
-                coinbase: true,
-                locked_until: Some(100),
+                coinbase: false,
+                locked_until: None,
                 owned: true,
             },
             Utxo {
@@ -139,8 +139,8 @@ mod tests {
                 confirmed: false,
                 spendable: true,
                 seen_at_height: Some(100),
-                coinbase: true,
-                locked_until: Some(100),
+                coinbase: false,
+                locked_until: None,
                 owned: true,
             },
             Utxo {
@@ -152,8 +152,8 @@ mod tests {
                 confirmed: false,
                 spendable: false,
                 seen_at_height: Some(100),
-                coinbase: true,
-                locked_until: Some(100),
+                coinbase: false,
+                locked_until: None,
                 owned: true,
             },
             Utxo {
@@ -165,8 +165,8 @@ mod tests {
                 confirmed: true,
                 spendable: false,
                 seen_at_height: Some(100),
-                coinbase: true,
-                locked_until: Some(100),
+                coinbase: false,
+                locked_until: None,
                 owned: true,
             },
         ];
@@ -213,8 +213,8 @@ mod tests {
             confirmed: true,
             spendable: true,
             seen_at_height: Some(100),
-            coinbase: true,
-            locked_until: Some(100),
+            coinbase: false,
+            locked_until: None,
             owned: true,
         });
 
@@ -227,8 +227,8 @@ mod tests {
             confirmed: false,
             spendable: true,
             seen_at_height: Some(100),
-            coinbase: true,
-            locked_until: Some(100),
+            coinbase: false,
+            locked_until: None,
             owned: true,
         });
 
@@ -241,8 +241,8 @@ mod tests {
             confirmed: false,
             spendable: false,
             seen_at_height: Some(100),
-            coinbase: true,
-            locked_until: Some(100),
+            coinbase: false,
+            locked_until: None,
             owned: true,
         });
 
@@ -296,8 +296,16 @@ mod tests {
 
     #[test]
     fn normal_owned_unlocked_utxo_is_spendable() {
-        let utxo = utxo_seen_at(Some(100));
-        let result = confirmations(&utxo, 100) >= 100;
-        assert!(result);
+        let mut immature_coinbase = utxo_seen_at(Some(50));
+        immature_coinbase.coinbase = true;
+        assert!(!is_spendable(&immature_coinbase, 100));
+
+        let mut locked = utxo_seen_at(Some(100));
+        locked.locked_until = Some(120);
+        assert!(is_spendable(&locked, 100));
+
+        let mut foreign = utxo_seen_at(Some(100));
+        foreign.owned = false;
+        assert!(!is_spendable(&foreign, 100));
     }
 }
