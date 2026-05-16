@@ -308,4 +308,50 @@ mod tests {
         foreign.owned = false;
         assert!(!is_spendable(&foreign, 100));
     }
+
+    #[test]
+    fn wallet_apply_tracks_found_confirmed_spent_and_reorged_utxos() {
+        let mut wallet = WalletState::new(100);
+        let outpoint = OutPoint {
+            txid: "aa".repeat(32),
+            vout: 0,
+        };
+
+        // Found
+        wallet.apply(SyncEvent::Found(utxo_seen_at(None)));
+        assert_eq!(wallet.utxos.len(), 1);
+
+        // Confirmed at height 101
+        wallet.apply(SyncEvent::Confirmed {
+            outpoint: outpoint.clone(),
+            height: 101,
+        });
+        let utxo = wallet
+            .utxos
+            .iter()
+            .find(|u| u.outpoint == outpoint)
+            .unwrap();
+        assert!(utxo.confirmed);
+        assert_eq!(utxo.seen_at_height, Some(101));
+
+        // Tip advanced
+        wallet.apply(SyncEvent::TipAdvanced(101));
+        assert_eq!(wallet.tip_height, 101);
+
+        // Reorged
+        wallet.apply(SyncEvent::Reorged {
+            outpoint: outpoint.clone(),
+        });
+        let utxo = wallet
+            .utxos
+            .iter()
+            .find(|u| u.outpoint == outpoint)
+            .unwrap();
+        assert!(!utxo.confirmed);
+        assert_eq!(utxo.seen_at_height, None);
+
+        // Spent
+        wallet.apply(SyncEvent::Spent(outpoint.clone()));
+        assert!(wallet.utxos.is_empty());
+    }
 }
