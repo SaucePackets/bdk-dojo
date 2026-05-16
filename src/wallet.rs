@@ -1,10 +1,19 @@
 use crate::balance::{BalanceSummary, classify_balance};
-use crate::utxo::Utxo;
+use crate::utxo::{OutPoint, Utxo};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct WalletState {
     pub utxos: Vec<Utxo>,
     pub tip_height: u32,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum SyncEvent {
+    Found(Utxo),
+    Confirmed { outpoint: OutPoint, height: u32 },
+    Spent(OutPoint),
+    Reorged { outpoint: OutPoint },
+    TipAdvanced(u32),
 }
 
 impl WalletState {
@@ -17,5 +26,32 @@ impl WalletState {
 
     pub fn balance(&self) -> BalanceSummary {
         classify_balance(&self.utxos)
+    }
+
+    pub fn apply(&mut self, event: SyncEvent) {
+        // todo!("mutate wallet state for each sync event")
+        match event {
+            SyncEvent::Found(utxo) => {
+                self.utxos.push(utxo);
+            }
+            SyncEvent::Confirmed { outpoint, height } => {
+                if let Some(utxo) = self.utxos.iter_mut().find(|u| u.outpoint == outpoint) {
+                    utxo.confirmed = true;
+                    utxo.seen_at_height = Some(height);
+                }
+            }
+            SyncEvent::Spent(outpoint) => {
+                self.utxos.retain(|u| u.outpoint != outpoint);
+            }
+            SyncEvent::Reorged { outpoint } => {
+                if let Some(utxo) = self.utxos.iter_mut().find(|u| u.outpoint == outpoint) {
+                    utxo.confirmed = false;
+                    utxo.seen_at_height = None;
+                }
+            }
+            SyncEvent::TipAdvanced(height) => {
+                self.tip_height = height;
+            }
+        }
     }
 }

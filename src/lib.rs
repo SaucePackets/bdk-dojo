@@ -8,7 +8,7 @@ pub use amount::Amount;
 pub use balance::{BalanceSummary, calculate_balance, classify_balance};
 pub use chain::{COINBASE_MATURITY, confirmations, is_spendable};
 pub use utxo::{OutPoint, Utxo};
-pub use wallet::WalletState;
+pub use wallet::{SyncEvent, WalletState};
 
 pub fn dojo_ready() -> bool {
     true
