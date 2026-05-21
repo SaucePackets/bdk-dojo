@@ -354,4 +354,36 @@ mod tests {
         wallet.apply(SyncEvent::Spent(outpoint.clone()));
         assert!(wallet.utxos.is_empty());
     }
+
+    #[test]
+    fn rollback_unconfirms_utxos_above_new_tip() {
+        let mut wallet = WalletState::new(100);
+        let outpoint = OutPoint {
+            txid: "aa".repeat(32),
+            vout: 0,
+        };
+
+        wallet.apply(SyncEvent::Found(utxo_seen_at(None)));
+        wallet.apply(SyncEvent::Confirmed {
+            outpoint: outpoint.clone(),
+            height: 105,
+        });
+        wallet.apply(SyncEvent::TipAdvanced(105));
+
+        assert_eq!(wallet.tip_height, 105);
+        assert!(wallet.checkpoints.contains(&105));
+
+        wallet.rollback_to_height(102);
+
+        assert_eq!(wallet.tip_height, 102);
+        assert!(!wallet.checkpoints.contains(&105));
+
+        let utxo = wallet
+            .utxos
+            .iter()
+            .find(|u| u.outpoint == outpoint)
+            .unwrap();
+        assert!(!utxo.confirmed);
+        assert_eq!(utxo.seen_at_height, None);
+    }
 }

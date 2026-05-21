@@ -5,6 +5,7 @@ use crate::utxo::{OutPoint, Utxo};
 pub struct WalletState {
     pub utxos: Vec<Utxo>,
     pub tip_height: u32,
+    pub checkpoints: Vec<u32>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -21,6 +22,7 @@ impl WalletState {
         WalletState {
             utxos: Vec::new(),
             tip_height,
+            checkpoints: vec![tip_height],
         }
     }
 
@@ -29,7 +31,6 @@ impl WalletState {
     }
 
     pub fn apply(&mut self, event: SyncEvent) {
-        // todo!("mutate wallet state for each sync event")
         match event {
             SyncEvent::Found(utxo) => {
                 self.utxos.push(utxo);
@@ -51,7 +52,19 @@ impl WalletState {
             }
             SyncEvent::TipAdvanced(height) => {
                 self.tip_height = height;
+                self.checkpoints.push(height);
             }
         }
+    }
+
+    pub fn rollback_to_height(&mut self, height: u32) {
+        self.checkpoints.retain(|&h| h <= height);
+        for utxo in self.utxos.iter_mut() {
+            if utxo.seen_at_height.map_or(false, |h| h > height) {
+                utxo.confirmed = false;
+                utxo.seen_at_height = None;
+            }
+        }
+        self.tip_height = height;
     }
 }
