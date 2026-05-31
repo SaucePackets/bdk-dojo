@@ -8,7 +8,7 @@ pub use amount::Amount;
 pub use balance::{BalanceSummary, calculate_balance, classify_balance};
 pub use chain::{COINBASE_MATURITY, confirmations, is_spendable};
 pub use utxo::{OutPoint, Utxo};
-pub use wallet::{SyncEvent, WalletState};
+pub use wallet::{SyncEvent, WalletState, AddressRecord};
 
 pub fn dojo_ready() -> bool {
     true
@@ -385,5 +385,24 @@ mod tests {
             .unwrap();
         assert!(!utxo.confirmed);
         assert_eq!(utxo.seen_at_height, None);
+    }
+
+    #[test]
+    fn next_unused_address_reuses_until_marked_used_the_derives_next() {
+        let mut wallet = WalletState::new(100);
+
+        // first call - no addresses yet
+        let addr1 = wallet.next_unused_address();
+        assert_eq!(addr1.index, 0);
+
+        // second call - same address still unused
+        let addr2 = wallet.next_unused_address();
+        assert_eq!(addr2.index, 0);
+
+        // mark it as used
+        wallet.addresses[0].used = true;
+
+        let addr3 = wallet.next_unused_address();
+        assert_eq!(addr3.index, 1);
     }
 }
