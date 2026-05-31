@@ -388,7 +388,7 @@ mod tests {
     }
 
     #[test]
-    fn next_unused_address_reuses_until_marked_used_the_derives_next() {
+    fn next_unused_address_reuses_until_marked_used_then_derives_next() {
         let mut wallet = WalletState::new(100);
 
         // first call - no addresses yet
