@@ -6,6 +6,14 @@ pub struct WalletState {
     pub utxos: Vec<Utxo>,
     pub tip_height: u32,
     pub checkpoints: Vec<u32>,
+    pub addresses: Vec<AddressRecord>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AddressRecord {
+    pub index: u32,
+    pub address: String,
+    pub used: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -23,6 +31,7 @@ impl WalletState {
             utxos: Vec::new(),
             tip_height,
             checkpoints: vec![tip_height],
+            addresses: Vec::new(),
         }
     }
 
@@ -66,5 +75,25 @@ impl WalletState {
             }
         }
         self.tip_height = height;
+    }
+
+    pub fn next_unused_address(&mut self) -> AddressRecord {
+        for address in self.addresses.iter_mut()  {
+            if address.used == false {
+                return address.clone();
+            }
+        }
+
+        let index = self.addresses.len();
+        
+        let record = AddressRecord {
+            index: index as u32,
+            address: format!("bcrt1q{}", index),
+            used: false,
+        };
+
+        self.addresses.push(record.clone());
+
+        record
     }
 }
