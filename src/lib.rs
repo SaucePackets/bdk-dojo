@@ -3,12 +3,14 @@ pub mod balance;
 pub mod chain;
 pub mod utxo;
 pub mod wallet;
+pub mod fees;
 
 pub use amount::Amount;
 pub use balance::{BalanceSummary, calculate_balance, classify_balance};
 pub use chain::{COINBASE_MATURITY, confirmations, is_spendable};
 pub use utxo::{OutPoint, Utxo};
 pub use wallet::{SyncEvent, WalletState, AddressRecord};
+pub use fees::{FeeRate, TxSizeEstimate, fee};
 
 pub fn dojo_ready() -> bool {
     true
@@ -404,5 +406,12 @@ mod tests {
 
         let addr3 = wallet.next_unused_address();
         assert_eq!(addr3.index, 1);
+    }
+
+    #[test]
+    fn fee_is_vbytes_times_fee_rate() {
+        let size = TxSizeEstimate { vbytes: 141 };
+        let rate = FeeRate { sat_per_vb: 2 };
+        assert_eq!(fee(size, rate), 282);
     }
 }
