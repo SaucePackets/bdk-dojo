@@ -308,3 +308,37 @@ Bitcoin/BDK pain point:
 Next lesson:
 
 - 3.1 — Fee rates and vbytes
+
+## 3.1 — Fee rates and vbytes
+
+Completed.
+
+Files changed:
+
+- `src/fees.rs`
+- `src/lib.rs`
+
+Tests passed:
+
+```text
+19 passed
+```
+
+Concept learned:
+
+- Fee = vbytes × sat/vB. Amount never enters the formula.
+- `FeeRate` (sat_per_vb) and `TxSizeEstimate` (vbytes) are two distinct domain types.
+- 141 vbytes at 2 sat/vB = 282 sats. A realistic 1-input SegWit baseline.
+- Fee rate is market-driven, not hardcoded.
+
+Rust pain point:
+
+- None — clean multiplication, no borrowing, no lifetime issues.
+
+Bitcoin/BDK pain point:
+
+- Real BDK uses `FeeRate` from `bdk_chain::FeeRate` with methods like `sat_per_vb()`, `sat_per_wu()`, and `estimate_fee()` via the chain client. The toy model strips it to the multiplication core.
+
+Next lesson:
+
+- 3.2 — Coin selection

@@ -267,3 +267,28 @@ Pain point:
 Next lesson:
 
 - 3.1 — Fee rates and vbytes
+
+## 3.1 — Fee rates and vbytes
+
+Status: complete
+
+Files changed:
+
+- `src/fees.rs`
+- `src/lib.rs` (exports, test)
+
+Tests passed:
+
+- `tests::fee_is_vbytes_times_fee_rate`
+
+What was learned:
+
+- Fee = vbytes × sat/vB. Amount sent never enters the formula.
+- `FeeRate` stores sat_per_vb; `TxSizeEstimate` stores vbytes.
+- A realistic 1-input SegWit tx is ~141 vbytes.
+- Fee rates are market-driven — 1–50+ sat/vB depending on mempool congestion.
+- Size determines fee, not value.
+
+Next lesson:
+
+- 3.2 — Coin selection
